@@ -7,5 +7,8 @@ To run the example, run `cake build` and open index.html in browser.
 
 Works in Google Chrome only (for now).
 
-Online example: http://valve.github.com/storemap/
+online example: http://valve.github.com/storemap/
 -------------------------------------------------
+
+To start working with online example, add floor first, then select a tool (rectangle or polygon) 
+from the toolbar and start drawing
