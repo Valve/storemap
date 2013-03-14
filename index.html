@@ -1,48 +1,190 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Storemap by Valve</title>
+    <title>
+      Store map
+    </title>
+    <link href="assets/css/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="assets/css/application.css" media="screen" rel="stylesheet" type="text/css" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">Storemap</h1>
-        <p class="header">HTML5 store map application (raphaeljs, knockoutjs, coffeescript)</p>
-
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/Valve/storemap/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/Valve/storemap/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/Valve/storemap">View On GitHub</a></li>
-        </ul>
-
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/Valve">Valve</a></p>
-
-
-      </header>
-      <section>
-        <h1>storemap</h1>
-
-<p>HTML5 store map application (raphaeljs, knockoutjs, coffeescript)</p>
-
-<p>To run the example, run <code>cake build</code> and open index.html in browser.</p>
-
-<p>Works in Google Chrome only (for now).</p>
-      </section>
-      <footer>
-        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
-      </footer>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">
+            Store map
+          </a>
+          <ul class="nav">
+            <li>
+              <a data-bind="click: saveProject, visible: hasFloors" href="#" title="Сохранить проект">
+                <i class="icon-cloud-upload icon-large">
+                </i>
+                Save project
+              </a>
+            </li>
+            <li>
+              <a data-bind="click: loadProject, visible: !hasFloors()" href="#" title="Загрузить проект">
+                <i class="icon-cloud-download icon-large">
+                </i>
+                Load project
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span1">
+          <div id="toolbox">
+            <div class="btn-group btn-group-vertical" data-toggle="buttons-radio">
+              <button class="btn" data-bind="click: setSelectTool, enable: hasFloors, attr: {'class': selectToolClass}" title="Select store">
+                <i class="icon-move icon-large">
+                </i>
+              </button>
+              <button class="btn" data-bind="click: setRectangleTool, enable: hasFloors, attr: {'class': rectangleToolClass}" title="Draw rectangular store">
+                <i class="icon-retweet icon-large">
+                </i>
+              </button>
+              <button class="btn" data-bind="click: setPolygonTool, enable: hasFloors, attr: {'class': polygonToolClass}" title="Draw complex store">
+                <i class="icon-star-empty icon-large">
+                </i>
+              </button>
+            </div>
+            <label>
+              stroke color
+            </label>
+            <input class="input-small" data-bind="value: strokeColor" id="stroke_color" type="color" />
+            <label>
+              fill color
+            </label>
+            <input class="input-small" data-bind="value: fillColor" id="fill_color" type="color" />
+            <label>
+              thickness
+            </label>
+            <input class="input-small" data-bind="value: strokeWidth" id="stroke_width" max="20" min="1" type="number" value="1" />
+            <label>
+              join type
+            </label>
+            <select class="input-small" data-bind="value: strokeJoin" id="stroke_linejoin">
+              <option value="bevel">
+                bevel
+              </option>
+              <option value="round">
+                round
+              </option>
+              <option value="miter">
+                miter
+              </option>
+            </select>
+            <button class="btn" data-bind="click: removeSelectedShape, enable: currentShape" title="Delete store">
+              <i class="icon-trash icon-large">
+              </i>
+            </button>
+          </div>
+        </div>
+        <div class="span8">
+          <a class="pull-right" data-bind="click: addFloor" href="#add-floor">
+            add floor
+          </a>
+          <ul class="nav nav-tabs" data-bind="foreach: floors" id="floor_tabs">
+            <li>
+              <button class="close" data-bind="click: $root.removeFloor" type="button">
+                &times;
+              </button>
+              <a data-bind="text: name(), click: $root.activateFloor, attr: {href: href()}" data-toggle="tab">
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content" data-bind="foreach: {data: floors, afterAdd: initCanvas}">
+            <div class="tab-pane" data-bind="attr: {id: tabPaneId()}">
+              <div class="canvas" data-bind="attr: {id: canvasId()}">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="span3">
+          <a data-bind="visible: canAddShop, click: addShop" href="#add-shop">
+            place store in shape
+          </a>
+          <a data-bind="visible: canRemoveShop, click: removeShop" href="#remove-shop">
+            remove store from shape
+          </a>
+          <form data-bind="visible: currentShop" style="display:none">
+            <fieldset>
+              <legend>
+                Store data
+              </legend>
+              <label>
+                logo
+                <br />
+                <input accept="image/*" data-bind="file: shopLogoImageFile, fileObjectURL: shopLogoImageObjectURL, fileBinaryData: shopLogoImageBinary" id="logo" type="file" />
+              </label>
+              <div>
+                <img class="img-polaroid" data-bind="attr: {src: shopLogoImageObjectURL}" data-src="holder.js/160x40" />
+              </div>
+              <br />
+              <input class="input-xlarge" data-bind="value: shopName" placeholder="Store name" type="text" />
+              <input class="input-xlarge" data-bind="value: shopUrl" placeholder="Web site" type="text" />
+              <input class="input-xlarge" data-bind="value: shopPhone" placeholder="Phone" type="text" />
+              <textarea class="input-xlarge" data-bind="value: shopDescription" placeholder="Description" rows="4">
+              </textarea>
+              <a data-toggle="modal" href="#shop_images_modal">
+                Store images
+              </a>
+              <div class="modal hide fade" id="shop_images_modal">
+                <div class="modal-header">
+                  <button aria-hidden="true" class="close" data-dismiss="modal" type="button">
+                    &times;
+                  </button>
+                  <h3>
+                    Store images
+                  </h3>
+                </div>
+                <div class="modal-body">
+                  <a data-bind="click: addShopImage" href="#add-shop-image">
+                    Add image
+                  </a>
+                  <div data-bind="foreach: {data: shopImages}" id="shop_images">
+                    <div class="pull-left">
+                      <img class="img-polaroid" data-bind="attr: {src: imageObjectURL}" data-src="holder.js/60x60" />
+                      <input accept="image/*" data-bind="file: imageFile, fileObjectURL: imageObjectURL, fileBinaryData: imageBinary" type="file" />
+                      <a data-bind="click: $parent.removeShopImage" href="remove-shop-image">
+                        Delete image
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <a class="btn btn-primary" data-dismiss="modal" href="#">
+                    Close
+                  </a>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <div id="status_bar">
+        <div id="mouse_coordinates">
+          <span id="mouse_x">
+          </span>
+          <span id="mouse_y">
+          </span>
+        </div>
+      </div>
+    </div>
+    <script src="lib/jquery-1.9.1.min.js"></script>
+    <script src="lib/raphael-2.1.0.min.js"></script>
+    <script src="lib/raphael.free_transform.js"></script>
+    <script src="lib/knockout-2.2.1.min.js"></script>
+    <script src="lib/bootstrap.min.js"></script>
+    <script src="lib/holder.min.js"></script>
+    <script src="gen/app.js"></script>
+    <script type="text/javascript">
+      ko.applyBindings(new Workspace('Store map'))
+    </script>
   </body>
 </html>
