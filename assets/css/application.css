@@ -1,0 +1,21 @@
+body{padding-top:60px;}
+.tab-content{
+  overflow: hidden !important;
+}
+rect{shape-rendering: crispEdges;}
+.canvas{
+    height: 100%;
+   border :1px solid #dcc;  
+  -webkit-user-select: none;
+}
+.color-picker{width: 80%;}
+
+#status_bar{
+  position: absolute;
+  height: 30px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border: 1px solid #999;
+}
+#mouse_coordinates{float: right; padding: 5px;}
